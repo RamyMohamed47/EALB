@@ -15,6 +15,12 @@ class EnsureUserIsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
+         if (! $request->user('api')?->isAdmin()) {
+            return response()->json([
+                'message' => 'Forbidden.',
+            ], 403);
+        }
+
         return $next($request);
     }
 }
