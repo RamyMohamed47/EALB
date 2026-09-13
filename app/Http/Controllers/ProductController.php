@@ -22,17 +22,9 @@ class ProductController extends Controller
      */
     public function index(Request $request):JsonResponse
     {
-        $validated = $request->validate([
-        'customer_id' => ['sometimes', 'integer', 'exists:users,id'],
-        ]);
-
         $user = $request->user('api');
 
         $products = Product::query()
-            ->when(
-                $user->isAdmin() && isset($validated['customer_id']),
-                fn ($query) => $query->where('user_id', $validated['customer_id'])
-            )
             ->when(
                 ! $user->isAdmin(),
                 fn ($query) => $query->where('user_id', $user->id)
@@ -116,5 +108,14 @@ class ProductController extends Controller
             return response()->json([
                 'message' => 'Product deleted successfully.',
             ]);
+    }
+
+    public function userProducts(User $user): JsonResponse
+    {
+        $products = $user->products()
+            ->latest()
+            ->paginate(15);
+
+        return response()->json($products);
     }
 }

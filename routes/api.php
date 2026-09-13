@@ -15,7 +15,14 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/me', [AuthController::class, 'me']);
 
-    Route::middleware('admin')->apiResource('users', UserController::class);
+
+    Route::middleware('admin')->group(function (): void {
+    Route::apiResource('users', UserController::class);
+    Route::get(
+        '/users/{user}/products',
+        [ProductController::class, 'userProducts']
+    )->name('users.products.index');
+});
 
     Route::apiResource('products', ProductController::class);
 });
