@@ -34,13 +34,18 @@ class AuthController extends Controller
 
     public function refresh(): JsonResponse
     {
-        $token = JWTAuth::refresh();
-
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => (int) config('jwt.ttl', 15) * 60,
-        ]);
+        try {
+            $newToken = JWTAuth::refresh();
+            return response()->json([
+                'access_token' => $newToken,
+                'token_type' => 'bearer',
+                'expires_in' => (int) config('jwt.ttl', 15) * 60,
+            ]);
+        } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+            return response()->json(['message' => 'Token invalid'], 401);
+        } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+            return response()->json(['message' => 'Token expired and not refreshable'], 401);
+        } 
     }
 
     public function login(Request $request): JsonResponse

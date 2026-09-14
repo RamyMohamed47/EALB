@@ -41,10 +41,10 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-        'title' => ['required', 'string', 'max:255'],
-        'slug' => ['required', 'string', 'max:255', 'unique:products,slug'],
-        'price' => ['required', 'numeric', 'min:0'],
-        'description' => ['nullable', 'string'],
+            'title' => ['required', 'string', 'max:255'],
+            'slug' => ['required', 'string', 'max:255', 'unique:products,slug'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'description' => ['nullable', 'string'],
         ]);
 
         $product = $request->user('api')
@@ -101,13 +101,13 @@ class ProductController extends Controller
      */
     public function destroy(Request $request, Product $product)
     {
-            $this->authorizeProductAccess($request->user('api'), $product);
+        $this->authorizeProductAccess($request->user('api'), $product);
 
-            $product->delete();
+        $product->delete();
 
-            return response()->json([
-                'message' => 'Product deleted successfully.',
-            ]);
+        return response()->json([
+            'message' => 'Product deleted successfully.',
+        ]);
     }
 
     public function userProducts(User $user): JsonResponse
