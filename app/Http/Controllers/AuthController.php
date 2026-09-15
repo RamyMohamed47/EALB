@@ -31,19 +31,19 @@ class AuthController extends Controller
             'user' => $user,
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => (int) config('jwt.ttl', 60) * 60,
+            'expires_in' => (int) config('jwt.ttl', 15) * 60,
         ], 201);
     }
 
     public function refresh(): JsonResponse
     {
         try {
-            $newToken = JWTAuth::refresh();
+            $newToken = JWTAuth::parseToken()->refresh();
 
             return response()->json([
                 'access_token' => $newToken,
                 'token_type' => 'bearer',
-                'expires_in' => (int) config('jwt.ttl', 15) * 60,
+                'expires_in' => (int) config('jwt.ttl', 2) * 60,
             ]);
         } catch (TokenInvalidException $e) {
             return response()->json(['message' => 'Token invalid'], 401);
@@ -72,7 +72,7 @@ class AuthController extends Controller
             'user' => JWTAuth::user(),
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => (int) config('jwt.ttl', 15) * 60,
+            'expires_in' => (int) config('jwt.ttl', 2) * 60,
         ]);
     }
 
