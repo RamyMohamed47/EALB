@@ -1,0 +1,838 @@
+{
+  "info": {
+    "_postman_id": "d49df83c-1f7f-4560-aed2-2e0ae28a7d33",
+    "name": "EALB",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "30671786",
+    "_collection_link": "https://go.postman.co/collection/30671786-d49df83c-1f7f-4560-aed2-2e0ae28a7d33?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Signup",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();\nconst token = json.token\n    || json.access_token\n    || (json.data && (json.data.token || json.data.access_token));\n\nif (token) {\n    pm.environment.set('jwt', token);\n    console.log('JWT saved:', token.substring(0, 20) + '...');\n} else {\n    console.warn('No JWT token found in response');\n}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Ramy Mohamed\",\r\n    \"email\": \"ramy@example.com\",\r\n    \"password\": \"test-1234\",\r\n    \"password_confirmation\": \"test-1234\",\r\n    \"phone\": \"01123381249\",\r\n    \"address\":\"16b katameya\",\r\n    \"job_description\":\"Finance department\"\r\n\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/register",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();\nconst token = json.token\n    || json.access_token\n    || (json.data && (json.data.token || json.data.access_token));\n\nif (token) {\n    pm.environment.set('jwt', token);\n    console.log('JWT saved:', token.substring(0, 20) + '...');\n} else {\n    console.warn('No JWT token found in response');\n}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"ramy@example.com\",\r\n    \"password\": \"test-1234\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/login",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();\nconst token = json.access_token || json.token\n    || (json.data && (json.data.access_token || json.data.token));\n\nif (token) {\n    pm.environment.set('jwt', token);\n    console.log('JWT refreshed and saved:', token.substring(0, 20) + '...');\n} else {\n    console.warn('No token found in refresh response');\n}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/refresh",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "refresh"
+              ]
+            },
+            "description": "Generated from cURL: curl -X POST http://127.0.0.1:8000/api/refresh -H \"Accept: application/json\" -H \"Authorization: Bearer {{jwt}}\""
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {\n    pm.environment.unset('jwt');\n    console.log('JWT cleared — logged out successfully');\n}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/logout",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/users",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "phone",
+                  "value": "01123396245",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Generated from cURL: curl -X GET \"http://127.0.0.1:8000/api/users\" -H \"Accept: application/json\""
+          },
+          "response": []
+        },
+        {
+          "name": "Get User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/users/2",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "users",
+                "2"
+              ]
+            },
+            "description": "Generated from cURL: curl -X GET \"http://127.0.0.1:8000/api/users/:id\" -H \"Accept: application/json\""
+          },
+          "response": []
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"\",\r\n    \"email\":\"\",\r\n    \"password\":\"\",\r\n    \"password_confirmation\":\"\",\r\n    \"phone\":\"\",\r\n    \"address\":\"\",\r\n    \"job_description\":\"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/users",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "users"
+              ]
+            },
+            "description": "Generated from cURL: curl -X POST \"http://127.0.0.1:8000/api/users\" -H \"Accept: application/json\" -H \"Content-Type: application/json\" -d '{\"name\":\"\",\"email\":\"\",\"password\":\"\",\"password_confirmation\":\"\",\"phone\":\"\",\"address\":\"\",\"job_description\":\"\"}'"
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"\",\r\n    \"email\":\"\",\r\n    \"phone\":\"\",\r\n    \"address\":\"\",\r\n    \"job_description\":\"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/users/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "users",
+                "1"
+              ]
+            },
+            "description": "Generated from cURL: curl -X PUT \"http://127.0.0.1:8000/api/users/:id\" -H \"Accept: application/json\" -H \"Content-Type: application/json\" -d '{\"name\":\"\",\"email\":\"\",\"phone\":\"\",\"address\":\"\",\"job_description\":\"\"}'"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/users/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "users",
+                "1"
+              ]
+            },
+            "description": "Generated from cURL: curl -X DELETE \"http://127.0.0.1:8000/api/users/:id\" -H \"Accept: application/json\""
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Products",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/users/5/products",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "users",
+                "5",
+                "products"
+              ]
+            },
+            "description": "Generated from cURL: curl -X GET \"http://127.0.0.1:8000/api/users/:id/products\" -H \"Accept: application/json\""
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Update Product",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"title\": \"First product\",\r\n    \"slug\": \"first-product\",\r\n    \"description\": \"This is the first product in the database\",\r\n    \"price\": \"99.99\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/products/5",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "products",
+                "5"
+              ]
+            },
+            "description": "Generated from cURL: curl -X PUT \"http://127.0.0.1:8000/api/products/:id\" -H \"Accept: application/json\" -H \"Content-Type: application/json\" -d '{\"name\": \"\",\"description\": \"\",\"price\": \"\",\"stock\": \"\",\"category_id\": \"\"}'"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/products/5",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "products",
+                "5"
+              ]
+            },
+            "description": "Generated from cURL: curl -X DELETE \"http://127.0.0.1:8000/api/products/:id\" -H \"Accept: application/json\""
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Products",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/products",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "3",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Generated from cURL: curl -X GET \"http://127.0.0.1:8000/api/products\" -H \"Accept: application/json\""
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/products/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "products",
+                "1"
+              ]
+            },
+            "description": "Generated from cURL: curl -X GET \"http://127.0.0.1:8000/api/products/:id\" -H \"Accept: application/json\""
+          },
+          "response": []
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"title\": \"Third product\",\r\n    \"slug\": \"third-product\",\r\n    \"description\": \"This is the third product in the database\",\r\n    \"price\": \"150\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/products",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "products"
+              ]
+            },
+            "description": "Generated from cURL: curl -X POST \"http://127.0.0.1:8000/api/products\" -H \"Accept: application/json\" -H \"Content-Type: application/json\" -d '{\"name\": \"\",\"description\": \"\",\"price\": \"\",\"stock\": \"\",\"category_id\": \"\"}'"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Products For a User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/users/1/products",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "users",
+                "1",
+                "products"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "// Skip auto-refresh for auth endpoints to avoid loops",
+          "const skipPaths = ['/api/login', '/api/register', '/api/refresh'];",
+          "const url = pm.request.url.toString();",
+          "if (skipPaths.some(path => url.includes(path))) return;",
+          "",
+          "const jwt = pm.environment.get('jwt');",
+          "if (!jwt) return;",
+          "",
+          "// Decode JWT payload to read expiration",
+          "function parseJwt(token) {",
+          "    try {",
+          "        const base64Url = token.split('.')[1];",
+          "        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');",
+          "        const jsonPayload = decodeURIComponent(",
+          "            atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')",
+          "        );",
+          "        return JSON.parse(jsonPayload);",
+          "    } catch (e) {",
+          "        return null;",
+          "    }",
+          "}",
+          "",
+          "const payload = parseJwt(jwt);",
+          "if (!payload || !payload.exp) return;",
+          "",
+          "const now = Math.floor(Date.now() / 1000);",
+          "",
+          "if (now >= payload.exp) {",
+          "    pm.sendRequest({",
+          "        url: 'http://127.0.0.1:8000/api/refresh',",
+          "        method: 'POST',",
+          "        header: {",
+          "            'Authorization': 'Bearer ' + jwt,",
+          "            'Accept': 'application/json'",
+          "        }",
+          "    }, function(err, res) {",
+          "        if (err) {",
+          "            console.error('[JWT Refresh] Request error:', err);",
+          "            return;",
+          "        }",
+          "",
+          "        console.log('[JWT Refresh] Status:', res.code);",
+          "        console.log('[JWT Refresh] Body:', res.text());",
+          "",
+          "        if (res.code >= 200 && res.code < 300) {",
+          "            const json = res.json();",
+          "            const newToken = json.access_token",
+          "                || json.token",
+          "                || json.jwt",
+          "                || (json.data && (json.data.access_token || json.data.token || json.data.jwt))",
+          "                || access_token;",
+          "",
+          "            if (newToken) {",
+          "                pm.environment.set('jwt', newToken);",
+          "                console.log('[JWT Refresh] Token updated successfully');",
+          "            } else {",
+          "                console.warn('[JWT Refresh] No token found in response. Available keys:', Object.keys(json).join(', '));",
+          "            }",
+          "        } else {",
+          "            console.warn('[JWT Refresh] Failed with status:', res.code);",
+          "        }",
+          "    });",
+          "}"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ]
+}

@@ -5,8 +5,11 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/register', [AuthController::class, 'register'])
+    ->middleware('throttle:10,1');
+Route::post('/login', [AuthController::class, 'login'])
+    ->middleware('throttle:6,1')
+    ->name('login');
 Route::post('/refresh', [AuthController::class, 'refresh']);
 
 Route::middleware('auth:api')->group(function () {

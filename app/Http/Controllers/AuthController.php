@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -36,16 +39,19 @@ class AuthController extends Controller
     {
         try {
             $newToken = JWTAuth::refresh();
+
             return response()->json([
                 'access_token' => $newToken,
                 'token_type' => 'bearer',
                 'expires_in' => (int) config('jwt.ttl', 15) * 60,
             ]);
-        } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+        } catch (TokenInvalidException $e) {
             return response()->json(['message' => 'Token invalid'], 401);
-        } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+        } catch (TokenExpiredException $e) {
             return response()->json(['message' => 'Token expired and not refreshable'], 401);
-        } 
+        } catch (JWTException $e) {
+            return response()->json(['message' => 'Token not provided or invalid'], 401);
+        }
     }
 
     public function login(Request $request): JsonResponse
@@ -69,17 +75,24 @@ class AuthController extends Controller
             'expires_in' => (int) config('jwt.ttl', 15) * 60,
         ]);
     }
+
     public function me(): JsonResponse
     {
-            return response()->json(JWTAuth::user());
+        return response()->json(JWTAuth::user());
     }
 
     public function logout(): JsonResponse
     {
-        JWTAuth::invalidate(JWTAuth::getToken());
+        try {
+            JWTAuth::invalidate(JWTAuth::getToken());
 
-        return response()->json([
-            'message' => 'Successfully logged out.',
-        ]);
+            return response()->json([
+                'message' => 'Successfully logged out.',
+            ]);
+        } catch (JWTException $e) {
+            return response()->json([
+                'message' => 'Token invalid or cannot be logged out',
+            ], 401);
+        }
     }
 }

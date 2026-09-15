@@ -34,7 +34,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-            $validated = $request->validate([
+        $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
@@ -43,25 +43,25 @@ class UserController extends Controller
             'job_description' => ['nullable', 'string'],
             'role' => [
                 'sometimes',
-                 Rule::in([
+                Rule::in([
                     User::ROLE_ADMIN,
                     User::ROLE_CUSTOMER,
                 ]),
             ],
-            ]);
+        ]);
 
-            $role = $validated['role'] ?? User::ROLE_CUSTOMER;
+        $role = $validated['role'] ?? User::ROLE_CUSTOMER;
 
-            unset($validated['role']);
+        unset($validated['role']);
 
+        $user = User::create($validated);
+        $user->role = $role;
+        $user->save();
 
-            $user = User::create($validated);
-            $user->role = $role;
-            $user->save();
-            return response()->json([
-                'message' => 'User created successfully.',
-                'user' => $user,
-            ], 201);
+        return response()->json([
+            'message' => 'User created successfully.',
+            'user' => $user,
+        ], 201);
     }
 
     /**
@@ -79,7 +79,7 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-            $validated = $request->validate([
+        $validated = $request->validate([
             'name' => ['sometimes', 'string', 'max:255'],
             'email' => [
                 'sometimes',
@@ -123,12 +123,24 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user): JsonResponse
     {
+        // Prevent an admin from deleting themselves
+        if ($request->user('api')?->id === $user->id) {
+            return response()->json([
+                'message' => 'You cannot delete your own account.',
+            ], 403);
+        }
+        // Prevent deleting the final administrator
+        if ($user->isAdmin() && User::where('role', User::ROLE_ADMIN)->count() <= 1) {
+            return response()->json([
+                'message' => 'Cannot delete the last remaining administrator.',
+            ], 422);
+        }
         $user->delete();
 
         return response()->json([
-        'message' => 'User deleted successfully.',
+            'message' => 'User deleted successfully.',
         ]);
     }
 }

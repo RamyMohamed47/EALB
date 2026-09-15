@@ -20,7 +20,7 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request):JsonResponse
+    public function index(Request $request): JsonResponse
     {
         $user = $request->user('api');
 
