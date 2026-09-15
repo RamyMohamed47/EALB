@@ -1,0 +1,3 @@
+[deploy]
+healthcheckPath = "/up"
+preDeployCommand = ["sh", "./railway/init-app.sh"]
